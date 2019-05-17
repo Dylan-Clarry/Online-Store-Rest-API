@@ -1,0 +1,37 @@
+// product
+.product {
+	max-width: 90%;
+	margin: 0 auto;
+
+	img {
+		@include undraggable-img;
+		width: 100%;
+	}
+
+	.name {
+		float: left;
+	}
+
+	.price {
+		float: right;
+	}
+}
+
+// small screen size
+@media(min-width: $md-pre) {
+	// grid
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: 50px;
+	}	
+}
+
+// medium screen size
+@media(min-width: $lg-pre) {
+	// grid
+	.grid {
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-gap: 50px;
+	}	
+}

@@ -1,0 +1,25 @@
+// imports //
+
+//utilities
+@import "utilities/variables";
+@import "utilities/mixins";
+
+//base
+@import "base/reset";
+@import "base/typography";
+
+//components
+@import "components/container";
+@import "components/navbar";
+@import "components/footer";
+
+//layout
+	//empty
+
+//pages
+@import "pages/index";
+@import "pages/about";
+@import "pages/contact";
+
+//vendors
+	//empty
