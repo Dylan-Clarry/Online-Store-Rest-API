@@ -38,29 +38,39 @@ const upload = multer({
 // ====================
 // models
 // ====================
-//const Order = require('../models/order');
 
 // ====================
 // controller
 // ====================
-const adminController = require('../controllers/adminController');
+const productController = require('../controllers/productController');
 
 // ====================
 // requests
 // ====================
 
 // GET
-router.get('/products', adminController.getAllProducts);
-router.get('/:productId', adminController.getOneProduct);
+
+// admin page
+router.get('/', checkAuth, productController.getAllProductsAdmin);
+
+// postman testing: get one product
+router.get('/:productId', checkAuth, productController.getOneProduct);
 
 // POST
-router.post('/', upload.single('productImage'), adminController.createProduct);
+
+// create new product
+router.post('/', checkAuth, upload.single('productImage'), productController.createProduct);
 
 // PATCH
-router.patch('/:productId', adminController.updateProduct);
+
+// update product
+router.post('/update', checkAuth, productController.updateProduct);
+
+// update product photo
+router.post('/updatePhoto', checkAuth, upload.single('productImage'), productController.updateProductPhoto);
 
 // DELETE
-router.delete('/:productId', adminController.deleteProduct);
+router.post('/delete', checkAuth, productController.deleteProduct);
 
 // ====================
 // exports

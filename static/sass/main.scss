@@ -12,6 +12,11 @@
 @import "components/container";
 @import "components/navbar";
 @import "components/footer";
+@import "components/modal";
+@import "components/form";
+@import "components/grid";
+@import "components/login-form";
+@import "components/message-sent";
 
 //layout
 	//empty
@@ -20,6 +25,7 @@
 @import "pages/index";
 @import "pages/about";
 @import "pages/contact";
+@import "pages/admin";
 
 //vendors
 	//empty

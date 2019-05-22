@@ -1,5 +1,7 @@
 {
 	"env": {
-		"JWT_KEY": "secret"
+		"JWT_KEY": "secret",
+		"GMAIL_EMAIL": "maclaughlingrainsender@gmail.com",
+		"GMAIL_PASSWORD": "turple12!"
 	}
 }

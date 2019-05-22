@@ -53,3 +53,15 @@
 	border-radius: 0;
 	-webkit-appearance: none;
 }
+
+// product div hover
+@mixin product-hover {
+	transform: scale(1.015);
+	-webkit-transform: scale(1.015);
+    -moz-transform: scale(1.015);
+    -o-transform: scale(1.015);
+    -webkit-box-shadow:rgba(0,0,0,0.1) 0px 5px 15px;
+    -moz-box-shadow:rgba(0,0,0,0.1) 0px 5px 15px;
+    -o-box-shadow:rgba(0,0,0,0.1) 0px 5px 15px;
+    box-shadow:rgba(0,0,0,0.1) 0px 5px 15px;
+}

@@ -1,0 +1,53 @@
+		<div class="container">
+			<div id="message-sent" class="hide-tag">
+				<h2>Request sent, thank you.</h2>
+			</div><!-- /message sent -->
+			<% if(count === 0) { %>
+			<h1 class="push-down">No products available at this time. Please follow the <a href="https://www.instagram.com/maclaughlingrain/" target="_blank"><u>Maclaughlin Grain Instagram</u></a> for future announcements.</h1>
+			<% } else { %>
+			<div class="shop grid">
+				<% for(var i = count - 1; i > -1; i--) { %>
+				<div data-target="modal-<%= i %>" data-toggle="modal" class="product fade-in">
+					<img data-target="modal-<%= i %>" data-toggle="modal" src="./<%= products[i].product.productImage %>" alt="product">
+					<p data-target="modal-<%= i %>" data-toggle="modal" class="name"><%= products[i].product.name %></p>
+					<p data-target="modal-<%= i %>" data-toggle="modal" class="price"><%= products[i].product.price %></p>
+				</div><!-- /product -->
+
+				<div id="modal-<%= i %>" class="modal">
+					<div class="modal-window product-modal">
+						<span class="close" data-dismiss="modal">&times;</span>
+						<img class="pointer" data-target="modal-enlarge-photo-<%= i %>" data-toggle="modal" data-dismiss="modal" src="./<%= products[i].product.productImage %>" alt="product">
+						<p class="small-print push-down-small">Click to enlarge</p>
+						<h2><%= products[i].product.name %></h2>
+						<br>
+						<p><%= products[i].product.description %></p>
+						<br>
+						<p>Request this item: &nbsp&nbsp <%= products[i].product.name %> - <%= products[i].product.price %> CAD</p>
+						<p class="small-print">*As each product is unique they are available only by request</p>
+						<br>
+						<form action="/" method="POST">
+							<input name="productName" type="hidden" value="<%= products[i].product.name %>">
+							<input name="productPrice" type="hidden" value="<%= products[i].product.price %> CAD">
+							<input name="productDescription" type="hidden" value="<%= products[i].product.description %>">
+							<input name="productImagePath" type="hidden" value="./<%= products[i].product.productImage %>">
+
+							<input id="name" name="name" placeholder="Name" type="text" required>
+							<input id="email" name="email" placeholder="Email" type="text" required="">
+							<input id="phoneNumber" name="phoneNumber" placeholder="Phone Number (optional)" type="text">
+							<textarea name="message" id="message" placeholder="Type your message here (required)" cols="30" rows="10" required></textarea>
+							<br>
+							<input class="submit-btn" id="submit" type="submit">
+						</form>
+					</div>
+				</div><!-- / "modal-<%= i %>" -->
+
+				<div id="modal-enlarge-photo-<%= i %>" class="modal">
+					<div class="modal-window large product-modal">
+						<span class="close" data-dismiss="modal">&times;</span>
+						<img class="large-photo" data-target="modal-change-photo" data-toggle="modal" src="./<%= products[i].product.productImage %>" alt="product">
+					</div>
+				</div><!-- /modal-delete-<%= i %> -->
+				<% } %>
+			</div><!-- /grid -->
+			<% } %>
+		</div><!-- /container -->

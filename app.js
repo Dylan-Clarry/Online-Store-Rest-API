@@ -11,9 +11,6 @@ const path = require('path');
 const app = express();
 const url = "mongodb://localhost";
 
-// ejs
-app.set('view engine', 'ejs');
-
 // ====================
 // database connection
 // ====================
@@ -33,6 +30,10 @@ app.use('/static', express.static('static'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// ejs
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/static/views/pages'))
+
 // add headers to avoid CORS
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -51,36 +52,38 @@ app.use((req, res, next) => {
 // ====================
 // routes
 // ====================
-
-// shop/index page
-app.get('/', (req, res) => {
-	res.render(path.join(__dirname + '/static/views/index.ejs'));
-	//res.sendFile(path.join(__dirname + '/static/views/index.ejs'));
-});
-
-const adminRoute = require('./api/routes/admin');
+const indexRoute = require('./api/routes/index');
+const aboutRoute = require('./api/routes/about');
 const contactRoute = require('./api/routes/contact');
-const shopRoute = require('./api/routes/shop');
+const adminRoute = require('./api/routes/admin');
+const loginRoute = require('./api/routes/login');
+const errorsRoute = require('./api/routes/errors');
 
 // Routes which handle requests
-app.use('/admin', adminRoute);
+app.use('/', indexRoute);
+app.use('/about', aboutRoute);
 app.use('/contact', contactRoute);
-// app.use('/shop', shopRoute);
+app.use('/admin', adminRoute);
+app.use('/login', loginRoute);
+app.use('/errors', errorsRoute);
 
 // error handling
 app.use((req, res, next) => {
-	const error = new Error("404 not found");
+	const error = new Error("404 not found.");
 	error.status = 404;
 	next(error);
 });
 
 app.use((error, req, res, next) => {
 	res.status(error.status || 500);
-	res.json({
-		error: {
-			message: error.message,
-		}
+	res.render('404', {
+		title: '404',
 	});
+	// res.json({
+	// 	error: {
+	// 		message: error.message,
+	// 	}
+	// });
 });
 
 // ====================

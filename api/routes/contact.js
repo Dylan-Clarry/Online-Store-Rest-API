@@ -5,19 +5,23 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-
 // ====================
 // controller
 // ====================
-const contactController = require('../controllers/contactController');
+const emailController = require('../controllers/emailController');
 
 // ====================
 // requests
 // ====================
 
 // POST
-router.post('/send', contactController.sendEmailRequest);
+router.get('/', (req, res, next) => {
+	res.render('contact', {
+		title: 'Contact',
+	});
+});
 
+router.post('/', emailController.sendContactRequest);
 
 // ====================
 // exports

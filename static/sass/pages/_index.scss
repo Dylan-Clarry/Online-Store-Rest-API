@@ -1,7 +1,9 @@
 // product
 .product {
+	transition: all 0.1s linear;
 	max-width: 90%;
 	margin: 0 auto;
+	padding: 25px;
 
 	img {
 		@include undraggable-img;
@@ -15,23 +17,27 @@
 	.price {
 		float: right;
 	}
+
+	&:hover {
+        @include product-hover;
+        cursor: pointer;
+    }
 }
 
-// small screen size
-@media(min-width: $md-pre) {
-	// grid
-	.grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-gap: 50px;
-	}	
+.fade-in {
+	opacity: 0; // animation on fade-in
 }
 
-// medium screen size
-@media(min-width: $lg-pre) {
-	// grid
-	.grid {
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-gap: 50px;
-	}	
+.product.is-visible {
+	animation: Items 600ms ease-in forwards;
+}
+
+@keyframes Items {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
 }

@@ -1,0 +1,33 @@
+<%- include('../partials/head.ejs') %>
+<%- include('../partials/navbar_contact.ejs') %>
+		<div class="container">
+			<div id="message-sent" class="hide-tag">
+				<h2>Message sent, thank you.</h2>
+			</div><!-- /message sent -->
+			<div class="contact">
+				<div class="box box-info">
+					<h1>Contact</h1>
+					<br>
+					<p>Robert Maclaughlin
+					<br>647 864 6692
+					<br>Markham, Ontario
+					<br><a href="mailto:robertdcmac@gmail.com">robertdcmac@gmail.com</a>
+				</p>
+				</div><!-- /box-header -->
+				
+				<div class="box box-form">
+					<form action="/contact/" method="POST">
+						<input id="name" name="name" placeholder="Name" type="text">
+						<br>
+						<input id="email" name="email" placeholder="Email" type="text">
+						<br>
+						<input id="subject" name="subject" placeholder="Subject" type="text">
+						<br>
+						<textarea name="message" id="message" placeholder="Message" cols="30" rows="10"></textarea>
+						<br>
+						<input class="submit-btn" id="submit" type="submit">
+					</form>
+				</div><!-- /box-form -->
+			</div><!-- /about -->
+		</div><!-- /container -->
+<%- include('../partials/footer.ejs') %>
