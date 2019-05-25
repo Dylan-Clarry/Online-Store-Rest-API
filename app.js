@@ -9,13 +9,13 @@ const path = require('path');
 
 // variables
 const app = express();
-const url = "mongodb://localhost";
+const url = "mongodb://localhost/maclaughlin_grain_products";
 
 // ====================
 // database connection
 // ====================
 mongoose.connect(
-	url + '/maclaughlin_grain_products',
+	url,
 	{
 		useNewUrlParser: true,
 	}
@@ -29,10 +29,6 @@ app.use(morgan('dev'));
 app.use('/static', express.static('static'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// ejs
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/static/views/pages'))
 
 // add headers to avoid CORS
 app.use((req, res, next) => {
@@ -52,20 +48,14 @@ app.use((req, res, next) => {
 // ====================
 // routes
 // ====================
-const indexRoute = require('./api/routes/index');
-const aboutRoute = require('./api/routes/about');
+const productsRoute = require('./api/routes/products');
 const contactRoute = require('./api/routes/contact');
-const adminRoute = require('./api/routes/admin');
-const loginRoute = require('./api/routes/login');
-const errorsRoute = require('./api/routes/errors');
+const usersRoute = require('./api/routes/users');
 
 // Routes which handle requests
-app.use('/', indexRoute);
-app.use('/about', aboutRoute);
+app.use('/products', productsRoute);
 app.use('/contact', contactRoute);
-app.use('/admin', adminRoute);
-app.use('/login', loginRoute);
-app.use('/errors', errorsRoute);
+app.use('/users', usersRoute);
 
 // error handling
 app.use((req, res, next) => {
@@ -76,14 +66,11 @@ app.use((req, res, next) => {
 
 app.use((error, req, res, next) => {
 	res.status(error.status || 500);
-	res.render('404', {
-		title: '404',
+	res.json({
+		error: {
+			message: error.message,
+		}
 	});
-	// res.json({
-	// 	error: {
-	// 		message: error.message,
-	// 	}
-	// });
 });
 
 // ====================

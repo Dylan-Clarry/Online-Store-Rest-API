@@ -9,7 +9,7 @@ const checkAuth = require('../middleware/check-auth');
 // ====================
 // controller
 // ====================
-const userController = require('../controllers/userController');
+const usersController = require('../controllers/usersController');
 
 // ====================
 // models
@@ -19,18 +19,25 @@ const userController = require('../controllers/userController');
 // requests
 // ====================
 
-// get
-router.get('/', (req, res, next) => {
-	res.render('login', {
-		title: "Login",
-	});
-});
+//////////
+// GET
+//////////
 
-router.post('/', userController.login);
+// get list of users
+router.get('/getusers', checkAuth, usersController.getUsersList);
 
-router.post('/signup', checkAuth, userController.signup);
+//////////
+// POST
+//////////
 
-router.delete('/delete', checkAuth, userController.delete);
+// login
+router.post('/login', usersController.login);
+
+// signup
+router.post('/signup', checkAuth, usersController.signup);
+
+// delete
+router.post('/delete', checkAuth, usersController.delete);
 
 // ====================
 // exports

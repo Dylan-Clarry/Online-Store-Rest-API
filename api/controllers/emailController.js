@@ -7,7 +7,7 @@ const nodeMailer = require('nodemailer');
 // ====================
 // models
 // ====================
-//const Order = require('../models/order');
+const Product = require('../models/product');
 
 // ====================
 // exports
@@ -16,68 +16,118 @@ const nodeMailer = require('nodemailer');
 // send product request
 exports.sendProductRequest = (req, res, next) => {
 
-	//product info
-	const productName = req.body.productName;
-	const productPrice = req.body.productPrice;
-	const productDescription = req.body.productDescription;
-	const productImagePath = req.body.productImagePath;
+	console.log("email: " + process.env.MG_RECEIVEREMAIL);
+	
+	// senders request info from req
+	const { id, name, email, phoneNumber, message } = req.body;
 
-	// senders request info
-	const name = req.body.name;
-	const email = req.body.email;
-	const phoneNumber = req.body.phoneNumber;
-	const message = req.body.message;
+	// get id from request and find it
+	Product.findById(id)
+	.select("name price description productImage")
+	.exec() // true promise
+	.then(product => {
 
-	const HelperOptions = {
-		from: name + '<' + process.env.GMAIL_EMAIL + '>',
-		to: 'dylan.imail@gmail.com',
-		subject: "Item Request: " + productName,
-		html: '<img src="cid:productImage" width="250px">'
-			+ "<p>Product Name: " + productName +"</p>"
-			+ "<p>Product Price: " + productPrice +"</p>"
-			+ "<p>Product Description: " + productDescription +"</p>"
-			+ "<br>"
-			+ "<p>From: " + name + "</p>"
-			+ "<p>Return Address: "+ email + "</p>"
-			+ "<p>Phone Number: " + phoneNumber + "</p>"
-			+ "<br><p>Message: </p>"
-			+ "<p>" + message + "</p>",
-		attachments: [{
-			filename: productName + ".png",
-			path: productImagePath,
-			cid: 'productImage',
-		}],
-	};
-	sendEmail(HelperOptions);
-	res.redirect(302, '/?messageSent=true');
+		// log product
+		console.log("from database: ", product);
+
+		// if a product was returned
+		if(product) {
+			
+			// create email
+			const emailMarkup = {
+				from: name + '<' + process.env.GMAIL_EMAIL + '>',
+				subject: "Item Request: " + product.name,
+				to: process.env.MG_RECEIVEREMAIL,
+				html: 
+					`
+					<img src="cid:productImage" width="250px">
+					<p>Product Name: ${product.name}</p>
+					<p>Product Price: ${product.price}</p>
+					<p>Product Description: ${product.description}</p>
+					<br />
+					<p>From: ${name}</p>
+					<p>Return Address: ${email}</p>
+					<p>Phone Number: ${phoneNumber}</p>
+					<br>
+					<p>Message: </p>
+					<p>${message}</p>
+					`,
+				attachments: [{
+					filename: product.name + ".png",
+					path: product.productImage,
+					cid: 'productImage',
+				}],
+			};
+
+			// send constructed email
+			sendEmail(emailMarkup);
+
+			// status 200 OK email sent
+			return res.status(200).json({
+				message: "Email sent successfully!",
+				email: emailMarkup,
+			});
+		} else {
+
+			// error 400 product not found
+			res.status(400).json({
+				message: "400: no product found with provided product id, unable to send email request",
+			});
+		}
+	})
+	.catch(err => {
+		
+		// status 500 internal server error
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error.",
+		});
+	});	
 }
 
 // send contact request
 exports.sendContactRequest = (req, res, next) => {
-	const name = req.body.name;
-	const email = req.body.email;
-	const subject = req.body.subject;
-	const message = req.body.message;
 
-	const HelperOptions = {
+	// get email components from req
+	const { name, email, subject, message } = req.body;
+
+	// construct email
+	const emailMarkup = {
 		from: name + '<' + process.env.GMAIL_EMAIL + '>',
-		to: 'dylan.imail@gmail.com',
+		to: process.env.MG_RECEIVEREMAIL,
 		subject: subject,
-		html: "<p>From: " + name + "</p>"
-			+ "<p>Return Address: "+ email + "</p>"
-			+ "<p>Subject: " + subject + "</p>"
-			+ "<br><p>Message: </p>"
-			+ "<p>" + message + "</p>",
+		html:
+			`
+			<p>From: ${name}</p>
+			<p>Return Address: ${email}</p>
+			<p>Subject: ${subject}</p>
+			<br>
+			<p>Message: </p>
+			<p>${message}</p>
+			`
 	};
-	sendEmail(HelperOptions);
-	res.redirect(302, '/contact/?messageSent=true');
+	try {
+
+		// send email
+		sendEmail(emailMarkup);
+		return res.status(200).json({
+			message: "Email sent successfully!",
+			email: emailMarkup,
+		});
+	} catch(err) {
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error."
+		});
+	};
 };
 
-const sendEmail = (HelperOptions) => {
+// send email functions
+const sendEmail = emailMarkup => {
 	const transporter = nodeMailer.createTransport({
 		service: "gmail",
 		secure: false,
-		port: 587,
+		port: 25,
 		auth: {
 			user: process.env.GMAIL_EMAIL,
 			pass: process.env.GMAIL_PASSWORD,
@@ -88,11 +138,52 @@ const sendEmail = (HelperOptions) => {
 		}
 	});
 
-	transporter.sendMail(HelperOptions, (err, info) => {
+	transporter.sendMail(emailMarkup, (err, info) => {
 		if(err) {
 			console.log(err);
 		}
 		console.log("Message sent!");
 		console.log(info);
+		// res.status(200).json({
+		// 	message: "Email sent successfully!",
+		// 	email: emailMarkup,
+		// });
 	});
 }
+
+const getProduct = id => {
+
+	// get id from request and find it
+	Product.findById(id)
+	.select("name price id productImage")
+	.exec() // true promise
+	.then(product => {
+
+		// log product
+		console.log("from database: ", product);
+
+		// if a product was returned
+		if(product) {
+			res.status(200).json({
+				product: product,
+				request: {
+					type: 'GET',
+					message: "get all products",
+					url: 'http://localhost:3000/products/',
+				},
+			});
+		} else {
+			res.status(400).json({
+				message: "400: no product found with provided product id",
+			});
+		}
+	})
+	.catch(err => {
+		
+		// status 500 internal server error
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error.",
+		});
+	});
+};

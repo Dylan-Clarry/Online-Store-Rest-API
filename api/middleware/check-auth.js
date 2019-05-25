@@ -2,20 +2,20 @@
 // imports
 // ====================
 const jwt = require('jsonwebtoken');
-const cp = require('cookie-parser');
 
 // ====================
 // exports
 // ====================
-module.exports = [cp(), (req, res, next) => {
+module.exports = (req, res, next) => {
 	try {
-		const decoded = jwt.verify(req.cookies['token'], process.env.JWT_KEY);
+		const token = req.headers.authorization.split(" ")[1];
+		console.log(token);
+		const decoded = jwt.verify(token, process.env.JWT_KEY);
 		req.userData = decoded;
 		next();
 	} catch(error) {
-		res.redirect(302, 'login');
-		// return res.status(401).json({
-		// 	message: "Auth failed",
-		// });
+		return res.status(401).json({
+			message: "Auth failed",
+		});
 	}
-}];
+};

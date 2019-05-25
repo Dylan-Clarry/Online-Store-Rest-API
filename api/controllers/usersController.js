@@ -13,11 +13,41 @@ const User = require('../models/user');
 // ====================
 // controllers
 // ====================
-const productController = require('../controllers/productController');
 
 // ====================
 // exports
 // ====================
+
+exports.getUsersList = (req, res, next) => {
+	User.find()
+	.select("email password")
+	.exec()
+	.then(users => {
+
+		// create response
+		const response = {
+			count: users.length,
+			users: users.map(user => {
+				return {
+					user: user,
+				}
+			}),
+		}
+
+		// status 200 OK
+		return res.status(200).json({
+			response: response,
+		});
+	})
+	.catch(err => {
+		
+		// status 500 internal server error
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error.",
+		});
+	});
+};
 
 // signup user
 exports.signup = (req, res, next) => {
@@ -28,7 +58,7 @@ exports.signup = (req, res, next) => {
 	.then(user => {
 		if(user.length >= 1) {
 			return res.status(409).json({
-				message: "Mail exists",
+				message: "Email exists",
 			});
 		} else {
 			bcrypt.hash(req.body.password, 10, (err, hash) => {
@@ -50,16 +80,24 @@ exports.signup = (req, res, next) => {
 						});
 					})
 					.catch(err => {
-						console.log(err);
+		
+						// status 500 internal server error
 						res.status(500).json({
 							error: err,
+							message: "500: internal server error.",
 						});
 					});
 				}
 			});
 		}
 	})
-	.catch();
+	.catch(err => {
+		// status 500 internal server error
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error.",
+		});
+	});
 };
 
 // login user
@@ -69,7 +107,7 @@ exports.login = (req, res, next) => {
 	.then(user => {
 		if(user.length < 1) {
 			return res.status(401).json({
-				message: "Auth failed",
+				message: "Auth failed, email not found",
 			});
 		}
 		console.log(req.body, user[0].password);
@@ -84,37 +122,48 @@ exports.login = (req, res, next) => {
 				const token = jwt.sign( // create jwt token
 					{
 						email: user[0].email,
-						userId: user[0]._id,
+						userId: user[0].id,
 					},
 					process.env.JWT_KEY,
 					{
 						expiresIn: "1h",
 					}
 				);
-				res.cookie('token', token);
-				res.redirect(302, '../admin');
-				noErr = true;
-			}
-
-			// prevent sending new headers after they have already been sent
-			if(!noErr) {
-				res.status(401).json({
-					message: "Auth failed",
+				return res.status(200).json({
+					message: "Auth successful",
+					token: token,
 				});
 			}
+			res.status(401).json({
+				message: "Auth failed, incorrect password",
+			});
 		});
 	})
 	.catch(err => {
+		
+		// status 500 internal server error
 		res.status(500).json({
 			error: err,
+			message: "500: internal server error.",
 		});
 	});
 };
 
 // delete user
 exports.delete = (req, res, next) => {
+	
+	// assign id from req
+	const { id } = req.body;
+
+	// check if id is passed
+	if(!id) {
+		res.status(400).json({
+			message: "400 id not defined",
+		});
+	}
+
 	User.remove({
-		_id: req.params.userId
+		_id: id
 	})
 	.exec()
 	.then(result => {
@@ -123,16 +172,11 @@ exports.delete = (req, res, next) => {
 		});
 	})
 	.catch(err => {
+		
+		// status 500 internal server error
 		res.status(500).json({
 			error: err,
+			message: "500: internal server error.",
 		});
 	});
 };
-
-
-
-
-
-
-
-

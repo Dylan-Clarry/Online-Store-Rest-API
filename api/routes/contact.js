@@ -14,14 +14,15 @@ const emailController = require('../controllers/emailController');
 // requests
 // ====================
 
+//////////
 // POST
-router.get('/', (req, res, next) => {
-	res.render('contact', {
-		title: 'Contact',
-	});
-});
+//////////
 
-router.post('/', emailController.sendContactRequest);
+// send product request email
+router.post('/product', emailController.sendProductRequest);
+
+// send contact email
+router.post('/contact', emailController.sendContactRequest);
 
 // ====================
 // exports
