@@ -7,6 +7,39 @@ const mongoose = require('mongoose');
 const checkAuth = require('../middleware/check-auth');
 const multer = require('multer');
 
+
+
+
+// const multerS3 = require('multer-s3');
+// const AWS = require('aws-sdk');
+// AWS.config.update({
+// 	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+// 	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// });
+// const s3 = new AWS.S3();
+
+// const bucket = process.env.AWS_BUCKET;
+
+// // AWS S3
+// const s3Storage = multerS3({
+// 	s3: s3,
+// 	bucket: bucket,
+// 	// set public read permissions
+// 	acl: 'public-read',
+// 	// auto set content type
+// 	contentType: multerS3.AUTO_CONTENT_TYPE,
+// 	// set key as original file name
+// 	key: function(req, file, cb) {
+// 		cb(null, new Date().toISOString() + file.originalname);
+// 	},
+// });
+
+
+
+
+
+
+
 // variables
 const storage = multer.diskStorage({
 	destination: function(req, file, cb) {
@@ -17,6 +50,7 @@ const storage = multer.diskStorage({
 	}
 });
 
+// filter file
 const fileFilter = (req, file, cb) => {
 	if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
 		// accept file
@@ -27,6 +61,7 @@ const fileFilter = (req, file, cb) => {
 	}	
 };
 
+// upload file
 const upload = multer({
 	storage: storage,
 	limits: {

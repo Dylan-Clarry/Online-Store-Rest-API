@@ -2,7 +2,13 @@
 	"env": {
 		"JWT_KEY": "secret",
 		"GMAIL_EMAIL": "maclaughlingrainsender@gmail.com",
-		"GMAIL_PASSWORD": "turple12!",
-		"MG_RECEIVEREMAIL": "dylan.imail@gmail.com"
+		"GMAIL_PASSWORD": "Turple12!",
+		"MONGO_ATLAS_USER": "robertdcmac",
+		"MONGO_ATLAS_PASSWORD": "Turple12!",
+		"MG_RECEIVEREMAIL": "dylan.imail@gmail.com",
+		"LOCAL_BUCKET": "http://localhost:3000/products/",
+		"AWS_ACCESS_KEY_ID": "yes",
+		"AWS_SECRET_ACCESS_KEY": "yes",
+		"AWS_BUCKET": "maclaughlin-grain"
 	}
 }

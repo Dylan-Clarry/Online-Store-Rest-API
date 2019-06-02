@@ -2,10 +2,11 @@
   "name": "maclaughlin_grain",
   "version": "1.0.0",
   "description": "A rest API to manage inventory for MacLaughlin Grain",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "start:dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,6 @@
     "nodemailer": "^6.1.1"
   },
   "devDependencies": {
-    "nodemon": "^1.19.0"
+    "nodemon": "^1.19.1"
   }
 }

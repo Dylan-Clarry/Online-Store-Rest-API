@@ -2,6 +2,7 @@
 // imports
 // ====================
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 // ====================
 // models
@@ -15,7 +16,7 @@ const Product = require('../models/product');
 // load products and serve onto index page
 exports.getAllProducts = (req, res, next) => {
 	Product.find()
-	.select("name price id productImage description")
+	.select("name price _id productImage description")
 	.exec()
 	.then(products => {
 
@@ -28,7 +29,7 @@ exports.getAllProducts = (req, res, next) => {
 					request: {
 						type: 'GET',
 						message: "get this product",
-						url: 'http://localhost:3000/products/' + product.id,
+						url: process.env.LOCAL_BUCKET + product._id,
 					},
 				}
 			}),
@@ -53,10 +54,10 @@ exports.getAllProducts = (req, res, next) => {
 exports.getOneProduct = (req, res, next) => {
 
 	// get id from request
-	const { id } = req.body;
+	const { _id } = req.body;
 
-	Product.findById(id)
-	.select("name price id productImage")
+	Product.findById(_id)
+	.select("name price _id productImage")
 	.exec() // true promise
 	.then(product => {
 
@@ -70,7 +71,7 @@ exports.getOneProduct = (req, res, next) => {
 				request: {
 					type: 'GET',
 					message: "get all products",
-					url: 'http://localhost:3000/products/',
+					url: process.env.LOCAL_BUCKET,
 				},
 			});
 		} else {
@@ -97,7 +98,7 @@ exports.createProduct = (req, res, next) => {
 
 	// create product
 	const product = new Product({
-		id: new mongoose.Types.ObjectId(),
+		_id: new mongoose.Types.ObjectId(),
 		name: req.body.name,
 		price: req.body.price,
 		description: req.body.description,
@@ -106,13 +107,21 @@ exports.createProduct = (req, res, next) => {
 
 	// save new product to database
 	product.save()
-	.then(result => {
+	.then(product => {
 
-		// log result
-		console.log(result);
+		// log product
+		console.log(product);
 
-		// redirect back to admin page
-		res.redirect(302, '/admin');
+		// product created
+		res.status(200).json({
+			message: "200 product successfully created",
+			product: product,
+				request: {
+					type: 'GET',
+					message: "get all products",
+					url: process.env.LOCAL_BUCKET + product._id,
+				},
+		});
 	})
 	.catch(err => {
 		
@@ -128,17 +137,17 @@ exports.createProduct = (req, res, next) => {
 exports.updateProduct = (req, res, next) => {
 
 	// get id from request
-	const { id } = req.body;
+	const { _id } = req.body;
 
 	console.log(req.body);
-	if(!id) {
+	if(!_id) {
 		return res.status(400).json({
 			message: "no id was given",
 		});
 	}
 
 	// update product
-	Product.updateMany({ _id: id }, {
+	Product.updateMany({ _id: _id }, {
 		name: req.body.name,
 		price: req.body.price,
 		description: req.body.description,
@@ -152,7 +161,7 @@ exports.updateProduct = (req, res, next) => {
 			request: {
 					type: 'GET',
 					message: "get this product",
-					url: 'http://localhost:3000/products/' + id,
+					url: process.env.LOCAL_BUCKET + _id,
 			}
 		});
 	})
@@ -170,12 +179,12 @@ exports.updateProduct = (req, res, next) => {
 exports.updateProductPhoto = (req, res, next) => {
 
 	// get id from request
-	const { id } = req.body;
+	const { _id } = req.body;
 
 	console.log(req.file);
 
 	// on empty fields
-	if(!id) {
+	if(!_id) {
 		res.status(400).json({
 			message: "no id was given",
 		});
@@ -186,7 +195,7 @@ exports.updateProductPhoto = (req, res, next) => {
 	}
 
 	// update product
-	Product.update({ id: req.body.id }, {
+	Product.update({ _id: req.body._id }, {
 		productImage: req.file.path,
 	})
 	.exec() // true promise
@@ -198,7 +207,7 @@ exports.updateProductPhoto = (req, res, next) => {
 			request: {
 					type: 'GET',
 					message: "get this product",
-					url: 'http://localhost:3000/products/' + id,
+					url: process.env.LOCAL_BUCKET + _id,
 			}
 		});
 	})
@@ -216,17 +225,33 @@ exports.updateProductPhoto = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
 	
 	// get id from request
-	const { id } = req.body;
+	const { _id } = req.body;
+
+	Product.findById(_id)
+	.select("productImage")
+	.exec() // true promise
+	.then(product => {
+		
+		// delete product image from file system
+		deleteProductImage(product.productImage);
+	})
+	.catch(err => {
+		// status 500 internal server error
+		res.status(500).json({
+			error: err,
+			message: "500: internal server error.",
+		});
+	});
 
 	// delete product
-	Product.deleteOne({ _id: id })
+	Product.deleteOne({ _id: _id })
 	.exec() // true promise
-	.then(result => {
+	.then(product => {
 		res.status(200).json({
 			message: "Product deleted",
 			request: {
 				type: 'POST',
-				url: 'http://localhost:3000/products/',
+				url: process.env.LOCAL_BUCKET,
 				body: {
 					name: 'String',
 					price: 'String',
@@ -245,6 +270,24 @@ exports.deleteProduct = (req, res, next) => {
 	});
 };
 
+////////////////////
+// HELPER FUNCTIONS
+////////////////////
+
+// deletes product image from uploads folder
+const deleteProductImage = path => {
+
+	console.log(path);
+
+	fs.unlink(path, err => {
+		if(err) {
+			console.log("error deleting product image from static.");
+			return
+		}
+		console.log(path + " removed");
+		return
+	});
+}
 
 
 

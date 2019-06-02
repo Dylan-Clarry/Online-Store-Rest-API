@@ -115,14 +115,14 @@ exports.login = (req, res, next) => {
 			if(err) {
 				return res.status(401).json({
 					message: "Auth failed",
-					error: err,
+					auth: '0',
 				});
 			}
 			if(result) {
 				const token = jwt.sign( // create jwt token
 					{
 						email: user[0].email,
-						userId: user[0].id,
+						userId: user[0]._id,
 					},
 					process.env.JWT_KEY,
 					{
@@ -131,11 +131,13 @@ exports.login = (req, res, next) => {
 				);
 				return res.status(200).json({
 					message: "Auth successful",
+					auth: '1',
 					token: token,
 				});
 			}
 			res.status(401).json({
 				message: "Auth failed, incorrect password",
+				auth: '0',
 			});
 		});
 	})
@@ -153,17 +155,17 @@ exports.login = (req, res, next) => {
 exports.delete = (req, res, next) => {
 	
 	// assign id from req
-	const { id } = req.body;
+	const { _id } = req.body;
 
 	// check if id is passed
-	if(!id) {
+	if(!_id) {
 		res.status(400).json({
 			message: "400 id not defined",
 		});
 	}
 
 	User.remove({
-		_id: id
+		_id: _id
 	})
 	.exec()
 	.then(result => {

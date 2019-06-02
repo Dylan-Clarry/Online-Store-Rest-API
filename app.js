@@ -9,7 +9,11 @@ const path = require('path');
 
 // variables
 const app = express();
-const url = "mongodb://localhost/maclaughlin_grain_products";
+
+console.log(process.env.MONGO_ATLAS_USER);
+console.log(process.env.MONGO_ATLAS_USER, process.env.MONGO_ATLAS_PASSWORD);
+
+const url = `mongodb+srv://${process.env.MONGO_ATLAS_USER}:${process.env.MONGO_ATLAS_PASSWORD}@maclaughlingrainproducts-jdenq.mongodb.net/test?retryWrites=true`;
 
 // ====================
 // database connection
@@ -27,6 +31,7 @@ mongoose.Promise = global.Promise;
 // morgan logging tool (middleware)
 app.use(morgan('dev'));
 app.use('/static', express.static('static'));
+// app.use(express.static(path.join(process.env.PWD, 'static')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

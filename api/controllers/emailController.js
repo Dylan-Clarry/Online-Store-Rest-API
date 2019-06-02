@@ -19,10 +19,10 @@ exports.sendProductRequest = (req, res, next) => {
 	console.log("email: " + process.env.MG_RECEIVEREMAIL);
 	
 	// senders request info from req
-	const { id, name, email, phoneNumber, message } = req.body;
+	const { _id, name, email, phoneNumber, message } = req.body;
 
 	// get id from request and find it
-	Product.findById(id)
+	Product.findById(_id)
 	.select("name price description productImage")
 	.exec() // true promise
 	.then(product => {
@@ -90,6 +90,8 @@ exports.sendContactRequest = (req, res, next) => {
 
 	// get email components from req
 	const { name, email, subject, message } = req.body;
+	console.log(req.body);
+	console.log(name, email, subject, message);
 
 	// construct email
 	const emailMarkup = {
@@ -109,6 +111,7 @@ exports.sendContactRequest = (req, res, next) => {
 	try {
 
 		// send email
+		console.log(emailMarkup);
 		sendEmail(emailMarkup);
 		return res.status(200).json({
 			message: "Email sent successfully!",
@@ -154,8 +157,8 @@ const sendEmail = emailMarkup => {
 const getProduct = id => {
 
 	// get id from request and find it
-	Product.findById(id)
-	.select("name price id productImage")
+	Product.findById(_id)
+	.select("name price _id productImage")
 	.exec() // true promise
 	.then(product => {
 
